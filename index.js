@@ -21,6 +21,11 @@ app.get("/getSignedCookie", (req, res) => {
   res.send("Ok, Signed Fruit");
 });
 
+app.get("/verifyfruit", (req, res) => {
+  console.log(req.signedCookies, req.cookies);
+  res.send(req.signedCookies);
+});
+
 app.listen(3002, () => {
   console.log("serving");
 });

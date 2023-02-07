@@ -39,3 +39,34 @@ app.get("/getSignedCookie", (req, res) => {
 - 쿠키에 서명하는 것은 숨기거나 암호화하는 것이 아니라 간섭을 간단하게 방지하는것.(서명에 사용하는 비밀 키는 비공개)
 - 쿠키에 서명을하게될 경우 서버에서 요청에 의해 쿠키 데이터에 접근하기 위해서는 `req.signedCookie`를 사용하고,
 - 서명하지 않은 쿠키의 데이터에 접근하는 경우 `req.cookie`를 사용
+
+## 예제
+
+```javascript
+const express = require("express");
+const cookieParser = require("cookie-parser");
+const app = express();
+
+app.use(cookieParser("secret_key"));
+
+app.get("/", function (req, res) {
+  res.cookie("signedCookie", "signedValue", { signed: true });
+  res.send("Cookie signed successfully");
+});
+
+app.get("/readCookie", function (req, res) {
+  const signedCookie = req.signedCookies.signedCookie;
+  if (signedCookie) {
+    res.send(`signedCookie: ${signedCookie}`);
+  } else {
+    res.send("signedCookie not found");
+  }
+});
+
+app.listen(3000);
+```
+
+- 이 예제에서는 cookie-parser 미들웨어를 가져와서 "secret_key"라는 비밀 키로 사용한다.
+- 그런 다음 "signedCookie"라는 이름의 서명된 쿠키를 "signedValue"라는 값으로 설정하는 라우트를 생성한다.
+- signed 옵션은 쿠키가 서명되어야함을 나타낸다. 또 다른 라우트는 서명된 쿠키를 읽고 그 값을 클라이언트에 전송하는 것이다.
+- req.signedCookies 객체는 서명된 쿠키에 액세스하는 데 사용된다. 쿠키가 찾아지면 그 값이 클라이언트에 전송되고, 그렇지 않으면 쿠키가 찾지 못한 것을 나타내는 메시지가 전송된다.
